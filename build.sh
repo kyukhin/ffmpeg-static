@@ -44,15 +44,19 @@ cd $BUILD_DIR
 ../fetchurl "http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz"
 ../fetchurl "http://downloads.sf.net/project/libpng/libpng15/older-releases/1.5.14/libpng-1.5.14.tar.gz"
 ../fetchurl "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
-../fetchurl "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.4.tar.gz"
+../fetchurl "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
 ../fetchurl "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
 ../fetchurl "http://webm.googlecode.com/files/libvpx-v1.3.0.tar.bz2"
 ../fetchurl "http://downloads.sourceforge.net/project/faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
 ../fetchurl "ftp://ftp.videolan.org/pub/x264/snapshots/last_x264.tar.bz2"
-../fetchurl "http://downloads.xvid.org/downloads/xvidcore-1.3.3.tar.gz"
+../fetchurl "http://downloads.xvid.org/downloads/xvidcore-1.3.4.tar.gz"
 ../fetchurl "http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz"
 ../fetchurl "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
-../fetchurl "http://www.ffmpeg.org/releases/ffmpeg-2.3.3.tar.bz2"
+../fetchurl "https://github.com/nijel/enca/archive/1.16.tar.gz"
+../fetchurl "http://fribidi.org/download/fribidi-0.19.6.tar.bz2"
+../fetchurl "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-0.9.41.tar.bz2"
+../fetchurl "https://github.com/libass/libass/releases/download/0.12.3/libass-0.12.3.tar.gz"
+../fetchurl "http://www.ffmpeg.org/releases/ffmpeg-2.7.1.tar.bz2"
 
 echo "*** Building yasm ***"
 cd $BUILD_DIR/yasm*
@@ -137,6 +141,38 @@ cd $BUILD_DIR/opus*
 make -j $jval
 make install
 
+echo "*** Building x265 ***"
+cd $BUILD_DIR
+hg clone https://bitbucket.org/multicoreware/x265
+cd x265/build/linux
+cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR" -DENABLE_SHARED:bool=off ../../source
+make -j $jval
+make install
+
+echo "*** Building enca ***"
+cd $BUILD_DIR/enca*
+./configure --prefix=$TARGET_DIR --enable-static --disable-shared
+make -j $jval
+make install
+
+echo "*** Building fribidi ***"
+cd $BUILD_DIR/fribidi*
+./configure --prefix=$TARGET_DIR --enable-static --disable-shared
+make -j $jval
+make install
+
+echo "*** Building harfbuzz ***"
+cd $BUILD_DIR/harfbuzz*
+./configure --prefix=$TARGET_DIR --enable-static --disable-shared
+make -j $jval
+make install
+
+echo "*** Building libass ***"
+cd $BUILD_DIR/libass*
+./configure --prefix=$TARGET_DIR --enable-static --disable-shared
+make -j $jval
+make install
+
 # FIXME: only OS-specific
 rm -f "$TARGET_DIR/lib/*.dylib"
 rm -f "$TARGET_DIR/lib/*.so"
@@ -144,5 +180,5 @@ rm -f "$TARGET_DIR/lib/*.so"
 # FFMpeg
 echo "*** Building FFmpeg ***"
 cd $BUILD_DIR/ffmpeg*
-CFLAGS="-I$TARGET_DIR/include" LDFLAGS="-L$TARGET_DIR/lib -lm" ./configure --prefix=${OUTPUT_DIR:-$TARGET_DIR} --extra-cflags="-I$TARGET_DIR/include -static" --extra-ldflags="-L$TARGET_DIR/lib -lm -static" --extra-version=static --disable-debug --disable-shared --enable-static --extra-cflags=--static --disable-ffplay --disable-ffserver --disable-doc --enable-gpl --enable-pthreads --enable-postproc --enable-gray --enable-runtime-cpudetect --enable-libfaac --enable-libmp3lame --enable-libopus --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --enable-bzlib --enable-zlib --enable-nonfree --enable-version3 --enable-libvpx --disable-devices
+PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" CFLAGS="-I$TARGET_DIR/include" LDFLAGS="-L$TARGET_DIR/lib -lm"  ./configure --prefix=${OUTPUT_DIR:-$TARGET_DIR} --extra-cflags="-I$TARGET_DIR/include -static" --extra-ldflags="-L$TARGET_DIR/lib -lm -static" --extra-version=static --disable-debug --disable-shared --enable-static --extra-cflags=--static --disable-ffplay --disable-ffserver --disable-doc --enable-gpl --enable-pthreads --enable-postproc --enable-gray --enable-runtime-cpudetect --enable-libfaac --enable-libmp3lame --enable-libopus --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libxvid --enable-bzlib --enable-zlib --enable-nonfree --enable-version3 --enable-libvpx --enable-libass --pkg-config-flags="--static"
 make -j $jval && make install
