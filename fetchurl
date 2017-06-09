@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Small utility to fetch and unpack archives on the web (with cache)
 #
@@ -101,18 +101,26 @@ if [ "$UNPACK" -ne 0 ]; then
   target_dir=`expand_path "$EXTRACT_DIR"`
   mkdir -p "$target_dir"
   sh cd "$target_dir"
+
+  s=`file $cache_file`
+  if [[ "$s" == *"text"* ]] ; then
+     echo " *** BUG BUG BUG: looks like we've downloaded text instead of the lib (404???) ***"
+     echo " *** File was: $cache_file"
+     echo " *** URL was: $URL"
+     exit 1
+  fi
   
   case "$extname" in
-    .tar.gz|.tgz)    
-      sh tar xzvf "$cache_file"
-    ;;
-    .tar.bz2)
-      sh tar xjvf "$cache_file"
-    ;;
-    *)
-      stderr BUG, this should not happen
-      exit 1
-    ;;
+      .tar.gz|.tgz)
+	  sh tar xzvf "$cache_file"
+      ;;
+      .tar.bz2)
+	  sh tar xjvf "$cache_file"
+	  ;;
+      *)
+	  stderr BUG, this should not happen
+	  exit 1
+	  ;;
   esac
 fi
 

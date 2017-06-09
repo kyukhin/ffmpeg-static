@@ -40,13 +40,13 @@ mkdir -p "$BUILD_DIR" "$TARGET_DIR"
 echo "#### FFmpeg static build, by STVS SA ####"
 cd $BUILD_DIR
 ../fetchurl "http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz"
-../fetchurl "http://zlib.net/zlib-1.2.8.tar.gz"
+../fetchurl "http://zlib.net/zlib-1.2.11.tar.gz"
 ../fetchurl "http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz"
 ../fetchurl "http://downloads.sf.net/project/libpng/libpng15/older-releases/1.5.14/libpng-1.5.14.tar.gz"
 ../fetchurl "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
 ../fetchurl "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
-../fetchurl "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
-../fetchurl "http://webm.googlecode.com/files/libvpx-v1.3.0.tar.bz2"
+../fetchurl "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.gz"
+../fetchurl "http://ftp.videolan.org/contrib/vpx/libvpx-1.4.0.tar.bz2"
 ../fetchurl "http://downloads.sourceforge.net/project/faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
 ../fetchurl "ftp://ftp.videolan.org/pub/x264/snapshots/last_x264.tar.bz2"
 ../fetchurl "http://downloads.xvid.org/downloads/xvidcore-1.3.4.tar.gz"
@@ -57,9 +57,16 @@ cd $BUILD_DIR
 ../fetchurl "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-0.9.41.tar.bz2"
 ../fetchurl "https://github.com/libass/libass/releases/download/0.12.3/libass-0.12.3.tar.gz"
 ../fetchurl "http://www.ffmpeg.org/releases/ffmpeg-2.7.1.tar.bz2"
+../fetchurl "http://www.nasm.us/pub/nasm/releasebuilds/2.13.01/nasm-2.13.01.tar.bz2"
 
 echo "*** Building yasm ***"
 cd $BUILD_DIR/yasm*
+./configure --prefix=$TARGET_DIR
+make -j $jval
+make install
+
+echo "*** Building nasm ***"
+cd $BUILD_DIR/nasm*
 ./configure --prefix=$TARGET_DIR
 make -j $jval
 make install
@@ -118,7 +125,7 @@ make install
 
 echo "*** Building x264 ***"
 cd $BUILD_DIR/x264*
-./configure --prefix=$TARGET_DIR --enable-static --disable-shared --disable-opencl
+./configure --prefix=$TARGET_DIR --enable-static --disable-opencl
 make -j $jval
 make install
 
